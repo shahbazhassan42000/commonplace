@@ -1,0 +1,134 @@
+import "server-only";
+import { cacheLife, cacheTag } from "next/cache";
+import { query } from "./db";
+
+/** Every read below is invalidated with this tag when a line is posted. */
+export const LINES_TAG = "lines";
+
+const PAGE_SIZE = 20;
+
+export type CategorySummary = { id: string; name: string; lineCount: number };
+
+export type LineItem = {
+  id: string;
+  body: string;
+  createdAt: string;
+  category: { id: string; name: string };
+};
+
+export type LinePage = { lines: LineItem[]; nextCursor: string | null };
+
+type CategoryRow = { id: string; name: string; line_count: number };
+
+type LineRow = {
+  id: string;
+  body: string;
+  created_at: Date;
+  category_id: string;
+  category_name: string;
+};
+
+const toCategory = (row: CategoryRow): CategorySummary => ({
+  id: row.id,
+  name: row.name,
+  lineCount: row.line_count,
+});
+
+const toLine = (row: LineRow): LineItem => ({
+  id: row.id,
+  body: row.body,
+  createdAt: row.created_at.toISOString(),
+  category: { id: row.category_id, name: row.category_name },
+});
+
+function toPage(rows: LineRow[]): LinePage {
+  const lines = rows.slice(0, PAGE_SIZE).map(toLine);
+  return {
+    lines,
+    nextCursor: rows.length > PAGE_SIZE ? lines[lines.length - 1].id : null,
+  };
+}
+
+const LINE_COLUMNS = `
+  l.id, l.body, l.created_at, c.id AS category_id, c.name AS category_name
+  FROM lines l JOIN categories c ON c.id = l.category_id`;
+
+/** Categories ranked by how many lines they hold. */
+export async function getPopularCategories(limit: number) {
+  "use cache: remote";
+  cacheTag(LINES_TAG);
+  cacheLife("hours");
+  const rows = await query<CategoryRow>(
+    `SELECT c.id, c.name, count(*)::int AS line_count
+     FROM lines l JOIN categories c ON c.id = l.category_id
+     GROUP BY c.id
+     ORDER BY line_count DESC, max(l.id) DESC
+     LIMIT $1`,
+    [limit],
+  );
+  return rows.map(toCategory);
+}
+
+export async function getAllCategories() {
+  "use cache: remote";
+  cacheTag(LINES_TAG);
+  cacheLife("hours");
+  const rows = await query<CategoryRow>(
+    `SELECT c.id, c.name, count(*)::int AS line_count
+     FROM lines l JOIN categories c ON c.id = l.category_id
+     GROUP BY c.id
+     ORDER BY lower(c.name)`,
+  );
+  return rows.map(toCategory);
+}
+
+export async function getCategory(id: string) {
+  "use cache: remote";
+  cacheTag(LINES_TAG);
+  cacheLife("hours");
+  const [row] = await query<CategoryRow>(
+    `SELECT c.id, c.name, count(l.id)::int AS line_count
+     FROM categories c LEFT JOIN lines l ON l.category_id = c.id
+     WHERE c.id = $1
+     GROUP BY c.id`,
+    [id],
+  );
+  return row ? toCategory(row) : null;
+}
+
+/** Newest first; pass the previous page's nextCursor to continue. */
+export async function getLatestLines(before: string | null) {
+  "use cache: remote";
+  cacheTag(LINES_TAG);
+  cacheLife("hours");
+  const rows = await query<LineRow>(
+    `SELECT ${LINE_COLUMNS}
+     WHERE ($1::bigint IS NULL OR l.id < $1)
+     ORDER BY l.id DESC
+     LIMIT $2`,
+    [before, PAGE_SIZE + 1],
+  );
+  return toPage(rows);
+}
+
+export async function getCategoryLines(categoryId: string, before: string | null) {
+  "use cache: remote";
+  cacheTag(LINES_TAG);
+  cacheLife("hours");
+  const rows = await query<LineRow>(
+    `SELECT ${LINE_COLUMNS}
+     WHERE l.category_id = $1 AND ($2::bigint IS NULL OR l.id < $2)
+     ORDER BY l.id DESC
+     LIMIT $3`,
+    [categoryId, before, PAGE_SIZE + 1],
+  );
+  return toPage(rows);
+}
+
+export async function getLine(id: string) {
+  "use cache: remote";
+  cacheTag(LINES_TAG);
+  cacheLife("days");
+  const [row] = await query<LineRow>(`SELECT ${LINE_COLUMNS} WHERE l.id = $1`, [id]);
+  return row ? toLine(row) : null;
+}

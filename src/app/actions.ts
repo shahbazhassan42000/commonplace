@@ -6,9 +6,9 @@ import { updateTag } from "next/cache";
 import { headers } from "next/headers";
 import { query } from "@/lib/db";
 import { LINES_TAG } from "@/lib/queries";
-import { CATEGORY_MAX, charLength, LINE_MAX, normalize } from "@/lib/text";
+import { CATEGORY_MAX, charLength, LINE_MAX, normalize, SOURCE_MAX } from "@/lib/text";
 
-type Fields = { line: string; category: string };
+type Fields = { line: string; category: string; source: string };
 
 export type PostLineState =
   | { status: "idle" }
@@ -31,9 +31,11 @@ export async function postLine(
   const values = {
     line: String(formData.get("line") ?? ""),
     category: String(formData.get("category") ?? ""),
+    source: String(formData.get("source") ?? ""),
   };
   const line = normalize(values.line);
   const category = normalize(values.category).replace(/^#+\s*/, "");
+  const source = normalize(values.source);
 
   const errors: Partial<Fields> = {};
   if (!line) errors.line = "Write a line first.";
@@ -42,7 +44,11 @@ export async function postLine(
   if (!category) errors.category = "Pick a category or add a new one.";
   else if (charLength(category) > CATEGORY_MAX)
     errors.category = `Category names are at most ${CATEGORY_MAX} characters.`;
-  if (errors.line || errors.category) return { status: "error", values, errors };
+  if (charLength(source) > SOURCE_MAX)
+    errors.source = `Keep the source to ${SOURCE_MAX} characters.`;
+  if (errors.line || errors.category || errors.source) {
+    return { status: "error", values, errors };
+  }
 
   if (formData.get("website")) {
     return { status: "error", values, errors: { form: "Something went wrong." } };
@@ -72,10 +78,10 @@ export async function postLine(
        ON CONFLICT (lower(name)) DO UPDATE SET name = categories.name
        RETURNING id, name
      )
-     INSERT INTO lines (body, category_id, author_hash)
-     SELECT $2, category.id, $3 FROM category
+     INSERT INTO lines (body, source, category_id, author_hash)
+     SELECT $2, $3, category.id, $4 FROM category
      RETURNING id, category_id, (SELECT name FROM category) AS category_name`,
-    [category, line, authorHash],
+    [category, line, source || null, authorHash],
   );
 
   updateTag(LINES_TAG);

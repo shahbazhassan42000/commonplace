@@ -2,7 +2,7 @@ import "server-only";
 import { cacheLife, cacheTag } from "next/cache";
 import { query } from "./db";
 
-/** Every read below is invalidated with this tag when a line is posted. */
+/** Every cached read below is invalidated with this tag when a line is posted. */
 export const LINES_TAG = "lines";
 
 const PAGE_SIZE = 20;
@@ -12,6 +12,7 @@ export type CategorySummary = { id: string; name: string; lineCount: number };
 export type LineItem = {
   id: string;
   body: string;
+  source: string | null;
   createdAt: string;
   category: { id: string; name: string };
 };
@@ -23,6 +24,7 @@ type CategoryRow = { id: string; name: string; line_count: number };
 type LineRow = {
   id: string;
   body: string;
+  source: string | null;
   created_at: Date;
   category_id: string;
   category_name: string;
@@ -37,6 +39,7 @@ const toCategory = (row: CategoryRow): CategorySummary => ({
 const toLine = (row: LineRow): LineItem => ({
   id: row.id,
   body: row.body,
+  source: row.source,
   createdAt: row.created_at.toISOString(),
   category: { id: row.category_id, name: row.category_name },
 });
@@ -50,7 +53,7 @@ function toPage(rows: LineRow[]): LinePage {
 }
 
 const LINE_COLUMNS = `
-  l.id, l.body, l.created_at, c.id AS category_id, c.name AS category_name
+  l.id, l.body, l.source, l.created_at, c.id AS category_id, c.name AS category_name
   FROM lines l JOIN categories c ON c.id = l.category_id`;
 
 /** Categories ranked by how many lines they hold. */
@@ -69,19 +72,6 @@ export async function getPopularCategories(limit: number) {
   return rows.map(toCategory);
 }
 
-export async function getAllCategories() {
-  "use cache: remote";
-  cacheTag(LINES_TAG);
-  cacheLife("hours");
-  const rows = await query<CategoryRow>(
-    `SELECT c.id, c.name, count(*)::int AS line_count
-     FROM lines l JOIN categories c ON c.id = l.category_id
-     GROUP BY c.id
-     ORDER BY lower(c.name)`,
-  );
-  return rows.map(toCategory);
-}
-
 export async function getCategory(id: string) {
   "use cache: remote";
   cacheTag(LINES_TAG);
@@ -96,33 +86,54 @@ export async function getCategory(id: string) {
   return row ? toCategory(row) : null;
 }
 
-/** Newest first; pass the previous page's nextCursor to continue. */
-export async function getLatestLines(before: string | null) {
+/** Newest first, optionally within one category; pass nextCursor to continue. */
+export async function getLines(categoryId: string | null, before: string | null) {
   "use cache: remote";
   cacheTag(LINES_TAG);
   cacheLife("hours");
   const rows = await query<LineRow>(
     `SELECT ${LINE_COLUMNS}
-     WHERE ($1::bigint IS NULL OR l.id < $1)
-     ORDER BY l.id DESC
-     LIMIT $2`,
-    [before, PAGE_SIZE + 1],
-  );
-  return toPage(rows);
-}
-
-export async function getCategoryLines(categoryId: string, before: string | null) {
-  "use cache: remote";
-  cacheTag(LINES_TAG);
-  cacheLife("hours");
-  const rows = await query<LineRow>(
-    `SELECT ${LINE_COLUMNS}
-     WHERE l.category_id = $1 AND ($2::bigint IS NULL OR l.id < $2)
+     WHERE ($1::bigint IS NULL OR l.category_id = $1)
+       AND ($2::bigint IS NULL OR l.id < $2)
      ORDER BY l.id DESC
      LIMIT $3`,
     [categoryId, before, PAGE_SIZE + 1],
   );
   return toPage(rows);
+}
+
+/**
+ * Lines whose text or source contains `q`, case-insensitively. Not cached:
+ * search terms are arbitrary, so entries would rarely be reused.
+ */
+export async function searchLines(q: string, categoryId: string | null, before: string | null) {
+  const pattern = `%${q.replace(/[\\%_]/g, (ch) => `\\${ch}`)}%`;
+  const rows = await query<LineRow>(
+    `SELECT ${LINE_COLUMNS}
+     WHERE (l.body ILIKE $1 OR l.source ILIKE $1)
+       AND ($2::bigint IS NULL OR l.category_id = $2)
+       AND ($3::bigint IS NULL OR l.id < $3)
+     ORDER BY l.id DESC
+     LIMIT $4`,
+    [pattern, categoryId, before, PAGE_SIZE + 1],
+  );
+  return toPage(rows);
+}
+
+/**
+ * A different line each day. Lines posted before today win, so the pick stays
+ * put while new lines arrive during the day.
+ */
+export async function getLineOfTheDay() {
+  "use cache: remote";
+  cacheTag(LINES_TAG);
+  cacheLife("hours");
+  const [row] = await query<LineRow>(
+    `SELECT ${LINE_COLUMNS}
+     ORDER BY l.created_at < current_date DESC, md5(l.id::text || current_date::text)
+     LIMIT 1`,
+  );
+  return row ? toLine(row) : null;
 }
 
 export async function getLine(id: string) {

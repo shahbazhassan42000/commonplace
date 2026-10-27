@@ -5,9 +5,8 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { RelativeTime } from "@/components/relative-time";
 import { ShareButton } from "@/components/share-button";
-import { LinesSkeleton } from "@/components/skeletons";
 import { getLine } from "@/lib/queries";
-import { cardPath, categoryPath, parseId } from "@/lib/text";
+import { browsePath, cardPath, parseId } from "@/lib/text";
 
 type Props = PageProps<"/l/[id]">;
 
@@ -20,7 +19,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const line = await findLine(params);
   if (!line) return { title: "Line not found" };
   const title = line.body.length > 60 ? `${line.body.slice(0, 57).trimEnd()}…` : line.body;
-  const description = `Filed under ${line.category.name} on Commonplace.`;
+  const description = `${line.source ? `${line.source} · ` : ""}Kept under ${line.category.name} on Commonplace.`;
   const image = { url: cardPath(line), width: 1200, height: 630, alt: line.body };
   return {
     title,
@@ -32,9 +31,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default function LinePage({ params }: Props) {
   return (
-    <Suspense fallback={<LinesSkeleton />}>
-      <LineContent params={params} />
-    </Suspense>
+    <div className="mx-auto flex w-full max-w-[795px] flex-col items-center px-6 pt-10 pb-24">
+      <Suspense fallback={<div aria-hidden="true" className="h-40 w-full animate-pulse rounded-[15px] bg-blush" />}>
+        <LineContent params={params} />
+      </Suspense>
+    </div>
   );
 }
 
@@ -43,21 +44,22 @@ async function LineContent({ params }: Pick<Props, "params">) {
   if (!line) notFound();
 
   return (
-    <article className="flex flex-col gap-10">
-      <div className="flex flex-col gap-6">
-        <p className="font-serif text-4xl leading-tight text-balance break-words sm:text-5xl">
-          {line.body}
-        </p>
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-muted">
-          <Link href={categoryPath(line.category)} className="chip">
-            {line.category.name}
-          </Link>
-          <RelativeTime iso={line.createdAt} />
-        </div>
+    <article className="flex w-full flex-col items-center gap-10 text-center">
+      <figure className="flex flex-col items-center gap-4">
+        <blockquote className="font-hand text-3xl leading-snug text-balance break-words text-burgundy sm:text-[40px]">
+          “{line.body}”
+        </blockquote>
+        <figcaption className="text-slate">-{line.source ?? "Anonymous"}</figcaption>
+      </figure>
+      <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-slate">
+        <Link href={browsePath({ category: line.category.id })} className="chip">
+          {line.category.name}
+        </Link>
+        <RelativeTime iso={line.createdAt} />
       </div>
 
-      <section aria-labelledby="share" className="flex flex-col gap-4">
-        <h2 id="share" className="text-sm font-semibold tracking-wide text-muted uppercase">
+      <section aria-labelledby="share" className="flex w-full flex-col items-center gap-5">
+        <h2 id="share" className="text-xs text-slate uppercase">
           Share this line
         </h2>
         <Image
@@ -66,10 +68,10 @@ async function LineContent({ params }: Pick<Props, "params">) {
           width={1200}
           height={630}
           unoptimized
-          className="h-auto w-full rounded-[var(--radius)] border border-rule"
+          className="h-auto w-full rounded-[15px] border border-burgundy"
         />
-        <div className="flex flex-wrap gap-3">
-          <a href={`/l/${line.id}/card/download`} className="button" download>
+        <div className="split">
+          <a href={`/l/${line.id}/card/download`} className="btn btn-red" download>
             Download image
           </a>
           <ShareButton path={`/l/${line.id}`} text={line.body} />

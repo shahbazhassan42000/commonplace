@@ -8,7 +8,7 @@ export type CategoryOption = { id: string; name: string };
 const MAX_SUGGESTIONS = 10;
 
 /**
- * One text field holds the post's single category. Existing categories are
+ * One text field holds the line's single category. Existing categories are
  * offered as one-tap choices; typing a name that doesn't exist creates it.
  * Matching is case-insensitive here and, authoritatively, in the database.
  */
@@ -17,11 +17,13 @@ export function CategoryPicker({
   value,
   onChange,
   error,
+  className = "",
 }: {
   options: CategoryOption[];
   value: string;
   onChange: (value: string) => void;
   error?: string;
+  className?: string;
 }) {
   const inputId = useId();
   const hintId = useId();
@@ -32,8 +34,8 @@ export function CategoryPicker({
   ).slice(0, MAX_SUGGESTIONS);
 
   return (
-    <div className="flex flex-col gap-2">
-      <label htmlFor={inputId} className="text-sm font-medium text-ink">
+    <div className={`flex flex-col gap-1 ${className}`}>
+      <label htmlFor={inputId} className="pl-[22px] font-hand text-2xl">
         Category
       </label>
       <input
@@ -44,24 +46,24 @@ export function CategoryPicker({
         maxLength={CATEGORY_MAX}
         required
         autoComplete="off"
-        placeholder="Pick one below or type a new one"
+        placeholder="Love, Motivational, Hope, Sad, others"
         aria-describedby={hintId}
         aria-invalid={error ? true : undefined}
-        className="field"
+        className="field h-12 max-w-[476px]"
       />
-      <p id={hintId} className="text-sm text-muted" aria-live="polite">
+      <p id={hintId} className="pl-[22px] font-hand text-sm text-slate" aria-live="polite">
         {error ? (
-          <span className="text-danger">{error}</span>
+          <span className="text-burgundy">{error}</span>
         ) : exact ? (
-          <>Posting to <strong className="text-ink">{exact.name}</strong>.</>
+          <>Filed under {exact.name}.</>
         ) : query ? (
           <>“{normalize(value)}” will be added as a new category.</>
         ) : (
-          "One category per line."
+          "Pick one below or type your own. One category per line."
         )}
       </p>
       {suggestions.length > 0 && (
-        <ul className="flex flex-wrap gap-2" aria-label="Existing categories">
+        <ul className="mt-1 flex flex-wrap gap-x-4 gap-y-2 pl-[22px]" aria-label="Existing categories">
           {suggestions.map((option) => {
             const selected = option === exact;
             return (

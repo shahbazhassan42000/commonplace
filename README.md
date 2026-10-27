@@ -1,10 +1,14 @@
 # Commonplace
 
-A public commonplace book: anyone can post a line, no account needed. Each line
-belongs to exactly one category. Categories are created on the fly the first time
-someone uses a new name, and matching is case-insensitive, so "Poetry" and
-"poetry" are the same category. The home page shows the five categories with the
-most lines, plus a link to browse all of them.
+A public commonplace book: anyone can share a line, no account needed. Each line
+belongs to exactly one category and can name its source (an author, a book, or
+"Written by me"). Categories are created on the fly the first time someone uses a
+new name, and matching is case-insensitive, so "Poetry" and "poetry" are the same
+category. The home page shows a line of the day and the five categories with the
+most lines; Browse lists everything, with search by keyword or author.
+
+The design follows the Commonplace Figma file; colors and fonts are tokens in
+`src/app/globals.css`, and the logo is `public/logo.svg`.
 
 ## Stack
 
@@ -24,9 +28,9 @@ most lines, plus a link to browse all of them.
 | Live check of Postgres + storage | `GET /api/health` |
 | Neon services for this branch (infrastructure as code) | `neon.ts` |
 
-Routes: `/` (post + top categories + latest lines), `/lines` (all lines),
-`/categories` (browse all), `/c/[id]-[slug]` (one category), `/l/[id]` (one line,
-with its share card).
+Routes: `/` (line of the day, top 5 categories), `/browse` (all lines; `?category=`,
+`?q=` search, `?before=` paging), `/submit` (share a line), `/about`, `/l/[id]` (one
+line, with its share card).
 
 ## Local development
 

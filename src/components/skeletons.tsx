@@ -1,23 +1,10 @@
-export function LinesSkeleton() {
+export function CardsSkeleton() {
   return (
-    <div className="flex flex-col gap-8">
+    <div className="grid w-full grid-cols-[repeat(auto-fill,minmax(264px,1fr))] gap-x-[46px] gap-y-6">
       <span className="sr-only">Loading…</span>
-      {[0, 1, 2].map((i) => (
-        <div key={i} aria-hidden="true" className="flex flex-col gap-3">
-          <div className="h-7 w-11/12 animate-pulse rounded bg-rule" />
-          <div className="h-7 w-2/3 animate-pulse rounded bg-rule" />
-          <div className="h-7 w-24 animate-pulse rounded-full bg-rule" />
-        </div>
+      {Array.from({ length: 6 }, (_, i) => (
+        <div key={i} aria-hidden="true" className="h-[77px] animate-pulse rounded-[8px] bg-blush" />
       ))}
-    </div>
-  );
-}
-
-export function HeadingSkeleton() {
-  return (
-    <div aria-hidden="true" className="flex flex-col gap-3">
-      <div className="h-4 w-28 animate-pulse rounded bg-rule" />
-      <div className="h-10 w-1/2 animate-pulse rounded bg-rule" />
     </div>
   );
 }

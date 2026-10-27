@@ -18,7 +18,7 @@ export function ShareButton({ path, text }: { path: string; text: string }) {
   }
 
   return (
-    <button type="button" onClick={share} className="chip" aria-live="polite">
+    <button type="button" onClick={share} className="btn btn-outline" aria-live="polite">
       {copied ? "Link copied" : "Share link"}
     </button>
   );

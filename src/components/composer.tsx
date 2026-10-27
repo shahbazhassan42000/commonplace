@@ -18,7 +18,7 @@ export function Composer({ categories }: { categories: CategoryOption[] }) {
 
   return (
     <>
-      <form action={formAction} className="flex w-full max-w-[661px] flex-col">
+      <form action={formAction} className="flex w-full max-w-[720px] flex-col">
         <ComposerFields
           key={fieldsKey}
           categories={categories}
@@ -26,11 +26,11 @@ export function Composer({ categories }: { categories: CategoryOption[] }) {
           errors={state.status === "error" ? state.errors : {}}
         />
         {state.status === "error" && state.errors.form && (
-          <p role="alert" className="mt-8 text-center font-hand text-burgundy">
+          <p role="alert" className="mt-8 text-center font-hand text-lg text-burgundy">
             {state.errors.form}
           </p>
         )}
-        <button type="submit" className="btn btn-red mt-20 w-[108px] self-center" disabled={pending}>
+        <button type="submit" className="btn btn-red mt-16 min-w-[130px] self-center" disabled={pending}>
           {pending ? "Sending…" : "Submit"}
         </button>
       </form>
@@ -61,7 +61,7 @@ function ComposerFields({
   return (
     <>
       <div className="flex flex-col gap-1">
-        <label htmlFor={lineId} className="pl-[22px] font-hand text-2xl">
+        <label htmlFor={lineId} className="pl-[22px] font-hand text-[26px]">
           The Line
         </label>
         <textarea
@@ -73,9 +73,9 @@ function ComposerFields({
           placeholder="Type the quote, line, poetry etc"
           aria-describedby={lineNoteId}
           aria-invalid={errors.line || remaining < 0 ? true : undefined}
-          className="field min-h-[86px] resize-y"
+          className="field min-h-[110px] resize-y"
         />
-        <p id={lineNoteId} className="min-h-5 pl-[22px] font-hand text-sm" aria-live="polite">
+        <p id={lineNoteId} className="min-h-6 pl-[22px] font-hand text-base" aria-live="polite">
           {errors.line ? (
             <span className="text-burgundy">{errors.line}</span>
           ) : remaining <= 40 ? (
@@ -95,7 +95,7 @@ function ComposerFields({
       />
 
       <div className="mt-[30px] flex flex-col gap-1">
-        <label htmlFor={sourceId} className="pl-[22px] font-hand text-2xl">
+        <label htmlFor={sourceId} className="pl-[22px] font-hand text-[26px]">
           Source
         </label>
         <input
@@ -107,10 +107,10 @@ function ComposerFields({
           autoComplete="off"
           placeholder="Author, Book, or “Written by me”"
           aria-invalid={errors.source ? true : undefined}
-          className="field h-12 max-w-[336px]"
+          className="field h-[54px] max-w-[400px]"
         />
         {errors.source && (
-          <p className="pl-[22px] font-hand text-sm text-burgundy">{errors.source}</p>
+          <p className="pl-[22px] font-hand text-base text-burgundy">{errors.source}</p>
         )}
       </div>
 

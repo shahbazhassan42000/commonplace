@@ -27,15 +27,19 @@ body {
   font-family: var(--font-display);
 }
 
+/*
+ * Sizes are scaled up from the Figma file, whose 10–15px text is too small to
+ * read comfortably; proportions, colors and shapes follow the design.
+ */
 @layer components {
   .btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    height: 35px;
-    padding: 0 14px;
+    height: 44px;
+    padding: 0 20px;
     border-radius: 15px;
-    font-size: 15px;
+    font-size: 17px;
     white-space: nowrap;
     transition: background-color 150ms;
   }
@@ -47,7 +51,7 @@ body {
     background: var(--burgundy-dark);
   }
   .btn-outline {
-    padding: 0 13px 0 17px;
+    padding: 0 20px 0 24px;
     border: 1px solid var(--ink);
     background: var(--parchment);
     color: var(--slate);
@@ -78,13 +82,13 @@ body {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    height: 30px;
-    padding: 0 12px 0 13px;
+    height: 38px;
+    padding: 0 16px 0 17px;
     border: 1px solid var(--burgundy);
     border-radius: 10px;
     background: var(--parchment);
     color: var(--slate);
-    font-size: 12px;
+    font-size: 15px;
     white-space: nowrap;
     transition: background-color 150ms, color 150ms;
   }
@@ -102,9 +106,9 @@ body {
     border: 1px solid var(--burgundy);
     border-radius: 15px;
     background: var(--parchment);
-    padding: 12px 22px;
+    padding: 14px 22px;
     font-family: var(--font-hand);
-    font-size: 15px;
+    font-size: 18px;
     color: var(--ink);
   }
   .field::placeholder {
@@ -119,10 +123,10 @@ body {
     position: relative;
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 8px;
     border-radius: 8px;
     background: var(--blush);
-    padding: 11px 7px 11px 17px;
+    padding: 16px 14px 16px 20px;
     color: var(--burgundy);
     transition: background-color 150ms;
   }

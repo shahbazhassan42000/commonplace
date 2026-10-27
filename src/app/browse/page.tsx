@@ -13,7 +13,7 @@ const CATEGORY_CHIPS = 30;
 
 export default function BrowsePage({ searchParams }: PageProps<"/browse">) {
   return (
-    <div className="mx-auto flex w-full max-w-[1406px] flex-col items-center px-6 pt-[30px] pb-24 sm:px-[59px]">
+    <div className="flex w-full flex-col items-center px-6 pt-[30px] pb-24 md:px-[83px]">
       <h1 className="sr-only">Browse lines</h1>
       <Suspense fallback={<BrowseSkeleton />}>
         <BrowseContent searchParams={searchParams} />
@@ -39,7 +39,7 @@ async function BrowseContent({ searchParams }: Pick<PageProps<"/browse">, "searc
 
   return (
     <>
-      <Form action="/browse" role="search" className="w-full max-w-[277px]">
+      <Form action="/browse" role="search" className="w-full max-w-[420px]">
         {selected && <input type="hidden" name="category" value={selected.id} />}
         <label htmlFor="q" className="sr-only">
           Search by a keyword or an author
@@ -51,11 +51,11 @@ async function BrowseContent({ searchParams }: Pick<PageProps<"/browse">, "searc
           defaultValue={q}
           maxLength={100}
           placeholder="Search by a Keyword or an Author"
-          className="h-8 w-full rounded-[15px] border border-ink bg-parchment px-4 text-center text-[15px] placeholder:text-slate"
+          className="h-11 w-full rounded-[15px] border border-ink bg-parchment px-5 text-center text-[17px] placeholder:text-slate"
         />
       </Form>
 
-      <nav aria-label="Categories" className="mt-[50px] flex flex-wrap justify-center gap-x-[26px] gap-y-3">
+      <nav aria-label="Categories" className="mt-12 flex flex-wrap justify-center gap-x-[26px] gap-y-3">
         <Link href={browsePath({ q })} className="chip" aria-current={selected ? undefined : "page"}>
           All
         </Link>
@@ -72,7 +72,7 @@ async function BrowseContent({ searchParams }: Pick<PageProps<"/browse">, "searc
       </nav>
 
       {q && (
-        <p className="mt-6 font-hand text-[15px] text-slate">
+        <p className="mt-6 font-hand text-lg text-slate">
           Lines matching “{q}” ·{" "}
           <Link href={browsePath({ category: selected?.id })} className="underline underline-offset-4">
             Clear search
@@ -102,8 +102,8 @@ async function BrowseContent({ searchParams }: Pick<PageProps<"/browse">, "searc
 function BrowseSkeleton() {
   return (
     <>
-      <div aria-hidden="true" className="h-8 w-full max-w-[277px] rounded-[15px] border border-ink" />
-      <div className="mt-[132px] w-full">
+      <div aria-hidden="true" className="h-11 w-full max-w-[420px] rounded-[15px] border border-ink" />
+      <div className="mt-[150px] w-full">
         <CardsSkeleton />
       </div>
     </>

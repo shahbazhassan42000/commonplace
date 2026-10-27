@@ -28,7 +28,7 @@ export function SubmittedDialog({
         Submitted!
       </p>
       <p className="mt-7 font-hand text-6xl leading-none sm:text-[96px]">Thank you!</p>
-      <div className="mt-14 flex flex-wrap justify-center gap-x-8 gap-y-3 text-[15px] text-parchment">
+      <div className="mt-14 flex flex-wrap justify-center gap-x-8 gap-y-3 text-lg text-parchment">
         <form method="dialog">
           <button className="underline underline-offset-4 hover:text-white">
             Share another line

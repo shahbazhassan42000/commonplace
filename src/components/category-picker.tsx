@@ -35,7 +35,7 @@ export function CategoryPicker({
 
   return (
     <div className={`flex flex-col gap-1 ${className}`}>
-      <label htmlFor={inputId} className="pl-[22px] font-hand text-2xl">
+      <label htmlFor={inputId} className="pl-[22px] font-hand text-[26px]">
         Category
       </label>
       <input
@@ -49,9 +49,9 @@ export function CategoryPicker({
         placeholder="Love, Motivational, Hope, Sad, others"
         aria-describedby={hintId}
         aria-invalid={error ? true : undefined}
-        className="field h-12 max-w-[476px]"
+        className="field h-[54px] max-w-[520px]"
       />
-      <p id={hintId} className="pl-[22px] font-hand text-sm text-slate" aria-live="polite">
+      <p id={hintId} className="pl-[22px] font-hand text-base text-slate" aria-live="polite">
         {error ? (
           <span className="text-burgundy">{error}</span>
         ) : exact ? (

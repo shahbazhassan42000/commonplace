@@ -46,12 +46,12 @@ async function LineContent({ params }: Pick<Props, "params">) {
   return (
     <article className="flex w-full flex-col items-center gap-10 text-center">
       <figure className="flex flex-col items-center gap-4">
-        <blockquote className="font-hand text-3xl leading-snug text-balance break-words text-burgundy sm:text-[40px]">
+        <blockquote className="font-hand text-[32px] leading-snug text-balance break-words text-burgundy md:text-[44px]">
           “{line.body}”
         </blockquote>
-        <figcaption className="text-slate">-{line.source ?? "Anonymous"}</figcaption>
+        <figcaption className="text-lg text-slate">-{line.source ?? "Anonymous"}</figcaption>
       </figure>
-      <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-slate">
+      <div className="flex flex-wrap items-center justify-center gap-4 text-[15px] text-slate">
         <Link href={browsePath({ category: line.category.id })} className="chip">
           {line.category.name}
         </Link>
@@ -59,7 +59,7 @@ async function LineContent({ params }: Pick<Props, "params">) {
       </div>
 
       <section aria-labelledby="share" className="flex w-full flex-col items-center gap-5">
-        <h2 id="share" className="text-xs text-slate uppercase">
+        <h2 id="share" className="text-sm tracking-[0.08em] text-slate uppercase">
           Share this line
         </h2>
         <Image

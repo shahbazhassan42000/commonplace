@@ -22,12 +22,20 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" className={`${jacques.variable} ${itim.variable} antialiased`}>
       <body className="flex min-h-dvh flex-col">
-        <header className="mx-auto w-full max-w-[1406px] px-6">
-          <div className="flex items-center justify-between gap-6 border-b-2 border-burgundy pt-[37px] pb-[14px]">
+        <header className="w-full px-6 md:px-[41px]">
+          <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-3 border-b-2 border-burgundy pt-8 pb-4">
             <Link href="/" className="shrink-0">
-              <Image src="/logo.svg" alt="Commonplace" width={113} height={26} priority unoptimized />
+              <Image
+                src="/logo.svg"
+                alt="Commonplace"
+                width={170}
+                height={39}
+                priority
+                unoptimized
+                className="h-auto w-[140px] md:w-[170px]"
+              />
             </Link>
-            <nav aria-label="Main" className="flex gap-5 text-xs text-slate sm:gap-[42px]">
+            <nav aria-label="Main" className="flex gap-6 text-base text-slate md:gap-[42px] md:text-[17px]">
               <Link href="/browse" className="hover:text-burgundy">
                 Browse
               </Link>

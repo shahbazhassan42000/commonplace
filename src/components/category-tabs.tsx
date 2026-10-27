@@ -30,7 +30,7 @@ export function CategoryTabs({ groups }: { groups: CategoryGroup[] }) {
           </button>
         ))}
       </div>
-      <section aria-label={`Lines in ${selected.category.name}`} className="mt-[52px] w-full">
+      <section aria-label={`Lines in ${selected.category.name}`} className="mt-14 w-full">
         <LineGrid lines={selected.lines} emptyText="No lines here yet." />
       </section>
     </>

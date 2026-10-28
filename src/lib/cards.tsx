@@ -3,7 +3,7 @@ import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { ImageResponse } from "next/og";
 import { getLine, type LineFull } from "./queries";
-import { isRtl, rtlBlock, rtlLine } from "./rtl";
+import { cardParagraphs, hasRtl, isRtl, rtlLine } from "./rtl";
 import { getObject, putObject } from "./storage";
 import { CARD_VERSION } from "./text";
 
@@ -54,23 +54,21 @@ function cardBody(body: string) {
   return truncated ? `${text}…` : text;
 }
 
-// The quote's box is the card's width less its side padding.
-const QUOTE_WIDTH = 1200 - 2 * 80;
-const MIN_FONT_SIZE = 30;
 const FLUSH_RIGHT = { justifyContent: "flex-end", textAlign: "right" } as const;
+// Gap between words laid out as flex items: Noto Sans Arabic's space width.
+const WORD_GAP_EM = 0.26;
 
 async function renderCard(line: LineFull) {
   const body = cardBody(line.text);
   const length = [...body].length;
   const fontSize =
-    length > 200 ? MIN_FONT_SIZE : length > 140 ? 38 : length > 80 ? 46 : length > 40 ? 54 : 60;
-  // Satori can't lay out right-to-left text itself: Urdu is pre-ordered (see
-  // ./rtl) and set flush right. Source and category go through rtlLine too,
-  // which leaves left-to-right text unchanged.
+    length > 200 ? 30 : length > 140 ? 38 : length > 80 ? 46 : length > 40 ? 54 : 60;
+  // Satori can't lay out right-to-left text itself (see ./rtl). Text with any
+  // Urdu is set paragraph by paragraph, each word a flex item placed in its
+  // paragraph's direction, so the layout wraps lines in the right order. The
+  // source and category go through rtlLine, which leaves Latin text unchanged.
   const rtl = isRtl(body);
-  const quote = rtl
-    ? rtlBlock(body, fontSize, QUOTE_WIDTH, MIN_FONT_SIZE)
-    : { fontSize, text: `“${body}”` };
+  const quoteStyle = { display: "flex", fontSize, lineHeight: 1.3, color: "#7a3b3b" } as const;
 
   const image = new ImageResponse(
     (
@@ -94,18 +92,34 @@ async function renderCard(line: LineFull) {
             gap: 28,
           }}
         >
-          <div
-            style={{
-              display: "flex",
-              whiteSpace: "pre-wrap",
-              fontSize: quote.fontSize,
-              lineHeight: 1.3,
-              color: "#7a3b3b",
-              ...(rtl ? FLUSH_RIGHT : {}),
-            }}
-          >
-            {quote.text}
-          </div>
+          {hasRtl(body) ? (
+            <div style={{ ...quoteStyle, flexDirection: "column" }}>
+              {cardParagraphs(body).map((paragraph, i) =>
+                paragraph ? (
+                  <div
+                    key={i}
+                    style={{
+                      display: "flex",
+                      flexWrap: "wrap",
+                      flexDirection: paragraph.dir === "R" ? "row-reverse" : "row",
+                      columnGap: Math.round(fontSize * WORD_GAP_EM),
+                    }}
+                  >
+                    {paragraph.units.map((unit, j) => (
+                      <div key={j} style={{ display: "flex" }}>
+                        {unit}
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  // A blank line between paragraphs.
+                  <div key={i} style={{ display: "flex", height: Math.round(fontSize / 2) }} />
+                ),
+              )}
+            </div>
+          ) : (
+            <div style={{ ...quoteStyle, whiteSpace: "pre-wrap" }}>{`“${body}”`}</div>
+          )}
           <div
             style={{
               display: "flex",

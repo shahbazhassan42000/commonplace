@@ -6,14 +6,8 @@ import { query } from "@/lib/db";
 import { hashClientIp } from "@/lib/ip-hash";
 import { LINES_TAG } from "@/lib/queries";
 import { requestMeta } from "@/lib/request-meta";
-import {
-  CATEGORY_MAX,
-  charLength,
-  LINE_MAX,
-  normalize,
-  normalizeMultiline,
-  SOURCE_MAX,
-} from "@/lib/text";
+import { BODY_HTML_MAX, deriveRichFields } from "@/lib/rich-text";
+import { CATEGORY_MAX, charLength, LINE_MAX, normalize, SOURCE_MAX } from "@/lib/text";
 
 type Fields = { line: string; category: string; source: string };
 
@@ -40,14 +34,15 @@ export async function postLine(
     category: String(formData.get("category") ?? ""),
     source: String(formData.get("source") ?? ""),
   };
-  const line = normalizeMultiline(values.line);
+  const { html, text, preview } = deriveRichFields(values.line);
   const category = normalize(values.category).replace(/^#+\s*/, "");
   const source = normalize(values.source);
 
   const errors: Partial<Fields> = {};
-  if (!line) errors.line = "Write a line first.";
-  else if (charLength(line) > LINE_MAX)
+  if (!text) errors.line = "Write a line first.";
+  else if (charLength(text) > LINE_MAX)
     errors.line = `Keep it to ${LINE_MAX} characters.`;
+  else if (html.length > BODY_HTML_MAX) errors.line = "That line is too long.";
   if (!category) errors.category = "Pick a category or add a new one.";
   else if (charLength(category) > CATEGORY_MAX)
     errors.category = `Category names are at most ${CATEGORY_MAX} characters.`;
@@ -88,12 +83,15 @@ export async function postLine(
        RETURNING id, name
      )
      INSERT INTO lines
-       (body, source, category_id, author_hash, ip, user_agent, accept_language, referer, geo)
-     SELECT $2, $3, category.id, $4, $5, $6, $7, $8, $9::jsonb FROM category
+       (body, body_html, body_preview, source, category_id,
+        author_hash, ip, user_agent, accept_language, referer, geo)
+     SELECT $2, $3, $4, $5, category.id, $6, $7, $8, $9, $10, $11::jsonb FROM category
      RETURNING id, category_id, (SELECT name FROM category) AS category_name`,
     [
       category,
-      line,
+      text,
+      html,
+      preview,
       source || null,
       authorHash,
       meta.ip,

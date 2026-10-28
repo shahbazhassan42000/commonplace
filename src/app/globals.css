@@ -147,3 +147,77 @@ body {
     outline-offset: 2px;
   }
 }
+
+/*
+ * Rich-text line content: the stored HTML shown on the site and the editor's
+ * editable area. Unlayered so these win over Tailwind's preflight reset.
+ */
+.rich {
+  overflow-wrap: anywhere;
+}
+.rich :is(p, ul, ol, blockquote, h1, h2, h3) {
+  margin: 0;
+}
+.rich > * + * {
+  margin-top: 0.5em;
+}
+.rich h1 {
+  font-size: 1.5em;
+  font-weight: 700;
+  line-height: 1.15;
+}
+.rich h2 {
+  font-size: 1.3em;
+  font-weight: 700;
+  line-height: 1.15;
+}
+.rich h3 {
+  font-size: 1.15em;
+  font-weight: 700;
+  line-height: 1.2;
+}
+.rich ul {
+  list-style: disc;
+  padding-inline-start: 1.4em;
+}
+.rich ol {
+  list-style: decimal;
+  padding-inline-start: 1.4em;
+}
+.rich li {
+  margin: 0.15em 0;
+}
+.rich blockquote {
+  border-inline-start: 3px solid currentColor;
+  padding-inline-start: 0.8em;
+  font-style: italic;
+}
+.rich a {
+  color: var(--burgundy);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.rich :is(strong, b) {
+  font-weight: 700;
+}
+.rich :is(em, i) {
+  font-style: italic;
+}
+.rich u {
+  text-decoration: underline;
+}
+.rich :is(s, del) {
+  text-decoration: line-through;
+}
+
+/* Tiptap editor placeholder and focus. */
+.rich-editor .tiptap:focus {
+  outline: none;
+}
+.rich-editor .tiptap p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  color: var(--slate);
+  float: left;
+  height: 0;
+  pointer-events: none;
+}

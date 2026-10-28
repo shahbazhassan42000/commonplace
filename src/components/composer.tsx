@@ -4,6 +4,7 @@ import { useActionState, useId, useState } from "react";
 import { postLine, type PostLineState } from "@/app/actions";
 import { charLength, LINE_MAX, SOURCE_MAX } from "@/lib/text";
 import { CategoryPicker, type CategoryOption } from "./category-picker";
+import { RichEditor } from "./rich-editor";
 import { SubmittedDialog } from "./submitted-dialog";
 
 const initialState: PostLineState = { status: "idle" };
@@ -50,30 +51,23 @@ function ComposerFields({
   values?: { line: string; category: string; source: string };
   errors: { line?: string; category?: string; source?: string };
 }) {
-  const lineId = useId();
   const lineNoteId = useId();
   const sourceId = useId();
-  const [line, setLine] = useState(values?.line ?? "");
+  const [lineText, setLineText] = useState("");
   const [category, setCategory] = useState(values?.category ?? "");
   const [source, setSource] = useState(values?.source ?? "");
-  const remaining = LINE_MAX - charLength(line);
+  const remaining = LINE_MAX - charLength(lineText);
 
   return (
     <>
       <div className="flex flex-col gap-1">
-        <label htmlFor={lineId} className="pl-[22px] font-hand text-[26px]">
-          The Line
-        </label>
-        <textarea
-          id={lineId}
+        <span className="pl-[22px] font-hand text-[26px]">The Line</span>
+        <RichEditor
           name="line"
-          value={line}
-          onChange={(e) => setLine(e.target.value)}
-          required
-          placeholder="Type the quote, line, poetry etc"
-          aria-describedby={lineNoteId}
-          aria-invalid={errors.line || remaining < 0 ? true : undefined}
-          className="field min-h-[110px] resize-y"
+          initialHTML={values?.line}
+          invalid={!!errors.line || remaining < 0}
+          ariaDescribedBy={lineNoteId}
+          onText={setLineText}
         />
         <p id={lineNoteId} className="min-h-6 pl-[22px] font-hand text-base" aria-live="polite">
           {errors.line ? (

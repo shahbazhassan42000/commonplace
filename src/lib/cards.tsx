@@ -2,7 +2,7 @@ import "server-only";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { ImageResponse } from "next/og";
-import { getLine, type LineItem } from "./queries";
+import { getLine, type LineFull } from "./queries";
 import { getObject, putObject } from "./storage";
 import { CARD_VERSION } from "./text";
 
@@ -52,8 +52,8 @@ function cardBody(body: string) {
   return truncated ? `${text}…` : text;
 }
 
-async function renderCard(line: LineItem) {
-  const body = cardBody(line.body);
+async function renderCard(line: LineFull) {
+  const body = cardBody(line.text);
   const length = [...body].length;
   const fontSize =
     length > 200 ? 30 : length > 140 ? 38 : length > 80 ? 46 : length > 40 ? 54 : 60;

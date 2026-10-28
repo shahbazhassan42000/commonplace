@@ -24,9 +24,9 @@ export default async function Home() {
           </h2>
           {lineOfTheDay ? (
             <figure className="mt-5 flex flex-col items-center gap-3">
-              <blockquote className="max-w-[760px] text-2xl leading-snug whitespace-pre-line break-words line-clamp-[6] md:text-[28px]">
-                <Link href={linePath(lineOfTheDay)} className="hover:text-burgundy">
-                  {lineOfTheDay.body}
+              <blockquote className="max-h-[15rem] max-w-[760px] overflow-hidden text-2xl leading-snug break-words md:text-[28px]">
+                <Link href={linePath(lineOfTheDay)} className="block hover:text-burgundy">
+                  <div className="rich" dangerouslySetInnerHTML={{ __html: lineOfTheDay.preview }} />
                 </Link>
               </blockquote>
               <figcaption className="text-base text-slate">

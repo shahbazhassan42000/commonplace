@@ -17,15 +17,8 @@ import {
 import { query } from "@/lib/db";
 import { hashClientIp } from "@/lib/ip-hash";
 import { LINES_TAG } from "@/lib/queries";
-import {
-  CATEGORY_MAX,
-  charLength,
-  LINE_MAX,
-  normalize,
-  normalizeMultiline,
-  parseId,
-  SOURCE_MAX,
-} from "@/lib/text";
+import { plainToRichFields } from "@/lib/rich-text";
+import { CATEGORY_MAX, charLength, LINE_MAX, normalize, parseId, SOURCE_MAX } from "@/lib/text";
 
 // --- Sign in -------------------------------------------------------------
 
@@ -178,13 +171,13 @@ export async function editLine(_prev: EditState, formData: FormData): Promise<Ed
   };
   if (!id) return { status: "error", id: "", values, errors: { form: "Unknown line." } };
 
-  const line = normalizeMultiline(values.line);
+  const { html, text, preview } = plainToRichFields(values.line);
   const category = normalize(values.category).replace(/^#+\s*/, "");
   const source = normalize(values.source);
 
   const errors: Partial<EditFields> = {};
-  if (!line) errors.line = "The line can’t be empty.";
-  else if (charLength(line) > LINE_MAX) errors.line = `Keep it to ${LINE_MAX} characters.`;
+  if (!text) errors.line = "The line can’t be empty.";
+  else if (charLength(text) > LINE_MAX) errors.line = `Keep it to ${LINE_MAX} characters.`;
   if (!category) errors.category = "Pick a category.";
   else if (charLength(category) > CATEGORY_MAX)
     errors.category = `Category names are at most ${CATEGORY_MAX} characters.`;
@@ -200,10 +193,11 @@ export async function editLine(_prev: EditState, formData: FormData): Promise<Ed
        RETURNING id
      )
      UPDATE lines
-     SET body = $2, source = $3, category_id = (SELECT id FROM category)
-     WHERE id = $4
+     SET body = $2, body_html = $3, body_preview = $4, source = $5,
+         category_id = (SELECT id FROM category)
+     WHERE id = $6
      RETURNING id`,
-    [category, line, source || null, id],
+    [category, text, html, preview, source || null, id],
   );
   if (updated.length === 0) {
     return { status: "error", id, values, errors: { form: "That line no longer exists." } };

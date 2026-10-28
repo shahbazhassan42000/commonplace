@@ -18,10 +18,10 @@ async function findLine(params: Props["params"]) {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const line = await findLine(params);
   if (!line) return { title: "Line not found" };
-  const title = preview(line.body, 60);
-  const ogTitle = preview(line.body, 90);
+  const title = preview(line.text, 60);
+  const ogTitle = preview(line.text, 90);
   const description = `${line.source ? `${line.source} · ` : ""}Kept under ${line.category.name} on Commonplace.`;
-  const image = { url: cardPath(line), width: 1200, height: 630, alt: preview(line.body, 120) };
+  const image = { url: cardPath(line), width: 1200, height: 630, alt: preview(line.text, 120) };
   return {
     title,
     description,
@@ -47,9 +47,10 @@ async function LineContent({ params }: Pick<Props, "params">) {
   return (
     <article className="flex w-full flex-col items-center gap-10 text-center">
       <figure className="flex flex-col items-center gap-4">
-        <blockquote className="font-hand text-[32px] leading-snug whitespace-pre-line break-words text-burgundy md:text-[44px]">
-          “{line.body}”
-        </blockquote>
+        <blockquote
+          className="rich font-hand text-[32px] leading-snug break-words text-burgundy md:text-[44px]"
+          dangerouslySetInnerHTML={{ __html: line.html }}
+        />
         <figcaption className="text-lg text-slate">-{line.source ?? "Anonymous"}</figcaption>
       </figure>
       <div className="flex flex-wrap items-center justify-center gap-4 text-[15px] text-slate">
@@ -65,7 +66,7 @@ async function LineContent({ params }: Pick<Props, "params">) {
         </h2>
         <Image
           src={cardPath(line)}
-          alt={`Share card: “${preview(line.body, 120)}”`}
+          alt={`Share card: “${preview(line.text, 120)}”`}
           width={1200}
           height={630}
           unoptimized
@@ -75,7 +76,7 @@ async function LineContent({ params }: Pick<Props, "params">) {
           <a href={`/l/${line.id}/card/download`} className="btn btn-red" download>
             Download image
           </a>
-          <ShareButton path={`/l/${line.id}`} text={line.body} />
+          <ShareButton path={`/l/${line.id}`} text={line.text} />
         </div>
       </section>
     </article>

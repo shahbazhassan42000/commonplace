@@ -1,10 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import type { CategorySummary, LineItem } from "@/lib/queries";
+import type { CategorySummary, LineCard } from "@/lib/queries";
 import { LineGrid } from "./line-grid";
 
-export type CategoryGroup = { category: CategorySummary; lines: LineItem[] };
+export type CategoryGroup = { category: CategorySummary; lines: LineCard[] };
 
 /** The top categories as toggle buttons; the selected one's lines show below. */
 export function CategoryTabs({ groups }: { groups: CategoryGroup[] }) {

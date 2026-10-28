@@ -13,7 +13,7 @@ export function LineGrid({ lines, emptyText }: { lines: LineItem[]; emptyText: s
           {/* The link's ::after stretches over the whole card. */}
           <Link
             href={linePath(line)}
-            className="font-hand text-[19px] leading-snug break-words after:absolute after:inset-0 after:rounded-[8px]"
+            className="font-hand text-[19px] leading-snug break-words whitespace-pre-line line-clamp-[10] after:absolute after:inset-0 after:rounded-[8px]"
           >
             {line.body}
           </Link>

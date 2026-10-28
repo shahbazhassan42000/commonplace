@@ -31,9 +31,32 @@ export async function getCard(lineId: string) {
   return { key, png, source: "generated" as const };
 }
 
+/** Trims a body to what fits the card, keeping line breaks and adding an ellipsis. */
+function cardBody(body: string) {
+  const MAX_LINES = 8;
+  const MAX_CHARS = 260;
+  let truncated = false;
+
+  let lines = body.split("\n");
+  if (lines.length > MAX_LINES) {
+    lines = lines.slice(0, MAX_LINES);
+    truncated = true;
+  }
+  let text = lines.join("\n");
+
+  const chars = [...text];
+  if (chars.length > MAX_CHARS) {
+    text = chars.slice(0, MAX_CHARS).join("").trimEnd();
+    truncated = true;
+  }
+  return truncated ? `${text}…` : text;
+}
+
 async function renderCard(line: LineItem) {
-  const length = [...line.body].length;
-  const fontSize = length > 200 ? 36 : length > 120 ? 44 : length > 60 ? 52 : 60;
+  const body = cardBody(line.body);
+  const length = [...body].length;
+  const fontSize =
+    length > 200 ? 30 : length > 140 ? 38 : length > 80 ? 46 : length > 40 ? 54 : 60;
 
   const image = new ImageResponse(
     (
@@ -57,8 +80,16 @@ async function renderCard(line: LineItem) {
             gap: 28,
           }}
         >
-          <div style={{ display: "flex", fontSize, lineHeight: 1.3, color: "#7a3b3b" }}>
-            {`“${line.body}”`}
+          <div
+            style={{
+              display: "flex",
+              whiteSpace: "pre-wrap",
+              fontSize,
+              lineHeight: 1.3,
+              color: "#7a3b3b",
+            }}
+          >
+            {`“${body}”`}
           </div>
           <div style={{ display: "flex", fontFamily: "Jacques Francois", fontSize: 30, color: "#4c5d6e" }}>
             {`-${line.source ?? "Anonymous"}`}

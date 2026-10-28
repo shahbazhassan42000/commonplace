@@ -1,12 +1,19 @@
 "use server";
 
-import { createHmac } from "node:crypto";
-import { ipAddress } from "@vercel/functions";
 import { updateTag } from "next/cache";
 import { headers } from "next/headers";
 import { query } from "@/lib/db";
+import { hashClientIp } from "@/lib/ip-hash";
 import { LINES_TAG } from "@/lib/queries";
-import { CATEGORY_MAX, charLength, LINE_MAX, normalize, SOURCE_MAX } from "@/lib/text";
+import { requestMeta } from "@/lib/request-meta";
+import {
+  CATEGORY_MAX,
+  charLength,
+  LINE_MAX,
+  normalize,
+  normalizeMultiline,
+  SOURCE_MAX,
+} from "@/lib/text";
 
 type Fields = { line: string; category: string; source: string };
 
@@ -33,7 +40,7 @@ export async function postLine(
     category: String(formData.get("category") ?? ""),
     source: String(formData.get("source") ?? ""),
   };
-  const line = normalize(values.line);
+  const line = normalizeMultiline(values.line);
   const category = normalize(values.category).replace(/^#+\s*/, "");
   const source = normalize(values.source);
 
@@ -54,7 +61,9 @@ export async function postLine(
     return { status: "error", values, errors: { form: "Something went wrong." } };
   }
 
-  const authorHash = await hashClientIp();
+  const requestHeaders = await headers();
+  const authorHash = hashClientIp(requestHeaders);
+  const meta = requestMeta(requestHeaders);
   if (authorHash) {
     const [{ recent }] = await query<{ recent: number }>(
       `SELECT count(*)::int AS recent FROM lines
@@ -78,10 +87,21 @@ export async function postLine(
        ON CONFLICT (lower(name)) DO UPDATE SET name = categories.name
        RETURNING id, name
      )
-     INSERT INTO lines (body, source, category_id, author_hash)
-     SELECT $2, $3, category.id, $4 FROM category
+     INSERT INTO lines
+       (body, source, category_id, author_hash, ip, user_agent, accept_language, referer, geo)
+     SELECT $2, $3, category.id, $4, $5, $6, $7, $8, $9::jsonb FROM category
      RETURNING id, category_id, (SELECT name FROM category) AS category_name`,
-    [category, line, source || null, authorHash],
+    [
+      category,
+      line,
+      source || null,
+      authorHash,
+      meta.ip,
+      meta.userAgent,
+      meta.acceptLanguage,
+      meta.referer,
+      meta.geo ? JSON.stringify(meta.geo) : null,
+    ],
   );
 
   updateTag(LINES_TAG);
@@ -94,13 +114,4 @@ export async function postLine(
       categoryName: created.category_name,
     },
   };
-}
-
-/** Keyed hash of the client IP, or null when no salt is configured. */
-async function hashClientIp() {
-  const salt = process.env.IP_HASH_SALT;
-  if (!salt) return null;
-  // Reads x-real-ip, which Vercel's edge sets and clients cannot spoof.
-  const ip = ipAddress(await headers()) ?? "unknown";
-  return createHmac("sha256", salt).update(ip).digest("base64url");
 }

@@ -24,7 +24,7 @@ export default async function Home() {
           </h2>
           {lineOfTheDay ? (
             <figure className="mt-5 flex flex-col items-center gap-3">
-              <blockquote className="max-w-[760px] text-2xl leading-snug text-balance break-words md:text-[28px]">
+              <blockquote className="max-w-[760px] text-2xl leading-snug whitespace-pre-line break-words line-clamp-[6] md:text-[28px]">
                 <Link href={linePath(lineOfTheDay)} className="hover:text-burgundy">
                   {lineOfTheDay.body}
                 </Link>

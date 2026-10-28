@@ -1,0 +1,17 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "side-tab",
+        "value": "*",
+        "files": [
+          "src/app/globals.css"
+        ],
+        "createdAt": "2026-10-28T10:16:11.253Z",
+        "reason": "agent decision: .rich blockquote left-rule (3px currentColor) is standard quoted-text typography in rich content, not a card side-tab accent; fitting for Commonplace's quote-focused UI"
+      }
+    ]
+  }
+}

@@ -9,7 +9,7 @@ import { CARD_VERSION } from "./text";
 const [itim, jacquesFrancois, notoArabic, logo] = await Promise.all([
   readFile(join(process.cwd(), "assets/fonts/Itim-Regular.ttf")),
   readFile(join(process.cwd(), "assets/fonts/JacquesFrancois-Regular.ttf")),
-  readFile(join(process.cwd(), "assets/fonts/NotoNaskhArabic-Regular.ttf")),
+  readFile(join(process.cwd(), "assets/fonts/NotoSansArabic-Regular.ttf")),
   readFile(join(process.cwd(), "public/logo.svg")),
 ]);
 const logoSrc = `data:image/svg+xml;base64,${logo.toString("base64")}`;
@@ -130,7 +130,9 @@ async function renderCard(line: LineFull) {
         { name: "Itim", data: itim, weight: 400, style: "normal" },
         { name: "Jacques Francois", data: jacquesFrancois, weight: 400, style: "normal" },
         // Arabic-script fallback so Urdu lines render instead of failing.
-        { name: "Noto Naskh Arabic", data: notoArabic, weight: 400, style: "normal" },
+        // Noto Sans Arabic: its GSUB avoids the lookup format Satori can't
+        // parse (Noto Naskh's does, which crashed card generation).
+        { name: "Noto Sans Arabic", data: notoArabic, weight: 400, style: "normal" },
       ],
     },
   );

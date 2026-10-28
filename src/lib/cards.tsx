@@ -3,6 +3,7 @@ import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { ImageResponse } from "next/og";
 import { getLine, type LineFull } from "./queries";
+import { isRtl, rtlBlock, rtlLine } from "./rtl";
 import { getObject, putObject } from "./storage";
 import { CARD_VERSION } from "./text";
 
@@ -53,11 +54,23 @@ function cardBody(body: string) {
   return truncated ? `${text}…` : text;
 }
 
+// The quote's box is the card's width less its side padding.
+const QUOTE_WIDTH = 1200 - 2 * 80;
+const MIN_FONT_SIZE = 30;
+const FLUSH_RIGHT = { justifyContent: "flex-end", textAlign: "right" } as const;
+
 async function renderCard(line: LineFull) {
   const body = cardBody(line.text);
   const length = [...body].length;
   const fontSize =
-    length > 200 ? 30 : length > 140 ? 38 : length > 80 ? 46 : length > 40 ? 54 : 60;
+    length > 200 ? MIN_FONT_SIZE : length > 140 ? 38 : length > 80 ? 46 : length > 40 ? 54 : 60;
+  // Satori can't lay out right-to-left text itself: Urdu is pre-ordered (see
+  // ./rtl) and set flush right. Source and category go through rtlLine too,
+  // which leaves left-to-right text unchanged.
+  const rtl = isRtl(body);
+  const quote = rtl
+    ? rtlBlock(body, fontSize, QUOTE_WIDTH, MIN_FONT_SIZE)
+    : { fontSize, text: `“${body}”` };
 
   const image = new ImageResponse(
     (
@@ -85,15 +98,24 @@ async function renderCard(line: LineFull) {
             style={{
               display: "flex",
               whiteSpace: "pre-wrap",
-              fontSize,
+              fontSize: quote.fontSize,
               lineHeight: 1.3,
               color: "#7a3b3b",
+              ...(rtl ? FLUSH_RIGHT : {}),
             }}
           >
-            {`“${body}”`}
+            {quote.text}
           </div>
-          <div style={{ display: "flex", fontFamily: "Jacques Francois", fontSize: 30, color: "#4c5d6e" }}>
-            {`-${line.source ?? "Anonymous"}`}
+          <div
+            style={{
+              display: "flex",
+              fontFamily: "Jacques Francois",
+              fontSize: 30,
+              color: "#4c5d6e",
+              ...(rtl ? FLUSH_RIGHT : {}),
+            }}
+          >
+            {rtlLine(`-${line.source ?? "Anonymous"}`)}
           </div>
         </div>
         <div
@@ -118,7 +140,7 @@ async function renderCard(line: LineFull) {
               color: "#4c5d6e",
             }}
           >
-            {line.category.name}
+            {rtlLine(line.category.name)}
           </div>
         </div>
       </div>

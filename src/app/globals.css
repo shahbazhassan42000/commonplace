@@ -155,6 +155,11 @@ body {
 .rich {
   overflow-wrap: anywhere;
 }
+/* Per-block base direction, so Urdu/Arabic lines render RTL and Latin LTR. */
+.rich,
+.rich :is(p, h1, h2, h3, li, blockquote) {
+  unicode-bidi: plaintext;
+}
 .rich :is(p, ul, ol, blockquote, h1, h2, h3) {
   margin: 0;
 }

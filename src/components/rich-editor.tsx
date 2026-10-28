@@ -48,6 +48,7 @@ export function RichEditor({
     editorProps: {
       attributes: {
         class: "rich min-h-[160px] px-[22px] py-[14px] focus:outline-none",
+        dir: "auto",
         role: "textbox",
         "aria-multiline": "true",
         "aria-label": "The line",

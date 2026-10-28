@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState, useEffect, useState } from "react";
+import { RichEditor } from "@/components/rich-editor";
 import type { AdminLine } from "@/lib/admin-queries";
 import type { LineGeo } from "@/lib/request-meta";
 import { deleteLine, editLine, type EditState, logout } from "./actions";
@@ -166,14 +167,8 @@ function EditorRow({
         <form action={formAction} className="flex flex-col gap-3">
           <input type="hidden" name="id" value={line.id} />
           <div className="flex flex-col gap-1">
-            <label className="font-hand text-base text-slate">Line</label>
-            <textarea
-              name="line"
-              defaultValue={line.body}
-              required
-              className="field min-h-[90px] resize-y"
-              aria-invalid={errors.line ? true : undefined}
-            />
+            <span className="font-hand text-base text-slate">Line</span>
+            <RichEditor name="line" initialHTML={line.html} invalid={!!errors.line} />
             {errors.line && <p className="font-hand text-sm text-burgundy">{errors.line}</p>}
           </div>
           <div className="flex flex-wrap gap-4">

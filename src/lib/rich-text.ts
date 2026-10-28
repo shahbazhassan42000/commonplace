@@ -111,17 +111,3 @@ export function deriveRichFields(dirtyHtml: string): RichFields {
   const preview = sanitizeHtml(truncateHtml(html), PREVIEW_OPTIONS).trim();
   return { html, text, preview };
 }
-
-/** Plain text (e.g. an admin edit) → the same three forms, as simple HTML. */
-export function plainToRichFields(plain: string): RichFields {
-  const escaped = plain
-    .replace(/\r\n?/g, "\n")
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
-  const html = escaped
-    .split(/\n{2,}/)
-    .map((block) => `<p>${block.replace(/\n/g, "<br>")}</p>`)
-    .join("");
-  return deriveRichFields(html);
-}

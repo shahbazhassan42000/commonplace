@@ -17,7 +17,7 @@ import {
 import { query } from "@/lib/db";
 import { hashClientIp } from "@/lib/ip-hash";
 import { LINES_TAG } from "@/lib/queries";
-import { plainToRichFields } from "@/lib/rich-text";
+import { BODY_HTML_MAX, deriveRichFields } from "@/lib/rich-text";
 import { CATEGORY_MAX, charLength, LINE_MAX, normalize, parseId, SOURCE_MAX } from "@/lib/text";
 
 // --- Sign in -------------------------------------------------------------
@@ -171,13 +171,14 @@ export async function editLine(_prev: EditState, formData: FormData): Promise<Ed
   };
   if (!id) return { status: "error", id: "", values, errors: { form: "Unknown line." } };
 
-  const { html, text, preview } = plainToRichFields(values.line);
+  const { html, text, preview } = deriveRichFields(values.line);
   const category = normalize(values.category).replace(/^#+\s*/, "");
   const source = normalize(values.source);
 
   const errors: Partial<EditFields> = {};
   if (!text) errors.line = "The line can’t be empty.";
   else if (charLength(text) > LINE_MAX) errors.line = `Keep it to ${LINE_MAX} characters.`;
+  else if (html.length > BODY_HTML_MAX) errors.line = "That line is too long.";
   if (!category) errors.category = "Pick a category.";
   else if (charLength(category) > CATEGORY_MAX)
     errors.category = `Category names are at most ${CATEGORY_MAX} characters.`;

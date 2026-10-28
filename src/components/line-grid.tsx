@@ -7,9 +7,9 @@ export function LineGrid({ lines, emptyText }: { lines: LineItem[]; emptyText: s
     return <p className="text-center font-hand text-lg text-slate">{emptyText}</p>;
   }
   return (
-    <ul className="grid w-full grid-cols-[repeat(auto-fill,minmax(300px,1fr))] items-start gap-x-[46px] gap-y-7">
+    <ul className="w-full columns-[300px] gap-x-[46px]">
       {lines.map((line) => (
-        <li key={line.id} className="line-card">
+        <li key={line.id} className="line-card mb-7 break-inside-avoid">
           {/* The link's ::after stretches over the whole card. */}
           <Link
             href={linePath(line)}

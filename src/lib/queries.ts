@@ -56,6 +56,17 @@ const LINE_COLUMNS = `
   l.id, l.body, l.source, l.created_at, c.id AS category_id, c.name AS category_name
   FROM lines l JOIN categories c ON c.id = l.category_id`;
 
+// Grids and the hero only show a short, line-clamped preview, so list reads
+// fetch just a prefix of the body instead of the full text (bodies can be up
+// to 30,000 chars). The cap is well beyond what the clamp ever renders, so the
+// cut is never visible — it only keeps the payload small. The single line page
+// and the share card use LINE_COLUMNS to get the full body.
+const PREVIEW_BODY_CHARS = 1200;
+const LINE_LIST_COLUMNS = `
+  l.id, left(l.body, ${PREVIEW_BODY_CHARS}) AS body, l.source, l.created_at,
+  c.id AS category_id, c.name AS category_name
+  FROM lines l JOIN categories c ON c.id = l.category_id`;
+
 /** Categories ranked by how many lines they hold. */
 export async function getPopularCategories(limit: number) {
   "use cache: remote";
@@ -92,7 +103,7 @@ export async function getLines(categoryId: string | null, before: string | null)
   cacheTag(LINES_TAG);
   cacheLife("hours");
   const rows = await query<LineRow>(
-    `SELECT ${LINE_COLUMNS}
+    `SELECT ${LINE_LIST_COLUMNS}
      WHERE ($1::bigint IS NULL OR l.category_id = $1)
        AND ($2::bigint IS NULL OR l.id < $2)
      ORDER BY l.id DESC
@@ -109,7 +120,7 @@ export async function getLines(categoryId: string | null, before: string | null)
 export async function searchLines(q: string, categoryId: string | null, before: string | null) {
   const pattern = `%${q.replace(/[\\%_]/g, (ch) => `\\${ch}`)}%`;
   const rows = await query<LineRow>(
-    `SELECT ${LINE_COLUMNS}
+    `SELECT ${LINE_LIST_COLUMNS}
      WHERE (l.body ILIKE $1 OR l.source ILIKE $1)
        AND ($2::bigint IS NULL OR l.category_id = $2)
        AND ($3::bigint IS NULL OR l.id < $3)
@@ -129,7 +140,7 @@ export async function getLineOfTheDay() {
   cacheTag(LINES_TAG);
   cacheLife("hours");
   const [row] = await query<LineRow>(
-    `SELECT ${LINE_COLUMNS}
+    `SELECT ${LINE_LIST_COLUMNS}
      ORDER BY l.created_at < current_date DESC, md5(l.id::text || current_date::text)
      LIMIT 1`,
   );

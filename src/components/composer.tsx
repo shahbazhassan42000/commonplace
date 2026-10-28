@@ -105,7 +105,7 @@ function ComposerFields({
           onChange={(e) => setSource(e.target.value)}
           maxLength={SOURCE_MAX}
           autoComplete="off"
-          placeholder="Author, Book, or “Written by me”"
+          placeholder="Author, Book, Anonymous or “Written by me”"
           aria-invalid={errors.source ? true : undefined}
           className="field h-[54px] max-w-[400px]"
         />

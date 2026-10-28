@@ -6,9 +6,10 @@ import { getLine, type LineFull } from "./queries";
 import { getObject, putObject } from "./storage";
 import { CARD_VERSION } from "./text";
 
-const [itim, jacquesFrancois, logo] = await Promise.all([
+const [itim, jacquesFrancois, notoArabic, logo] = await Promise.all([
   readFile(join(process.cwd(), "assets/fonts/Itim-Regular.ttf")),
   readFile(join(process.cwd(), "assets/fonts/JacquesFrancois-Regular.ttf")),
+  readFile(join(process.cwd(), "assets/fonts/NotoNaskhArabic-Regular.ttf")),
   readFile(join(process.cwd(), "public/logo.svg")),
 ]);
 const logoSrc = `data:image/svg+xml;base64,${logo.toString("base64")}`;
@@ -128,6 +129,8 @@ async function renderCard(line: LineFull) {
       fonts: [
         { name: "Itim", data: itim, weight: 400, style: "normal" },
         { name: "Jacques Francois", data: jacquesFrancois, weight: 400, style: "normal" },
+        // Arabic-script fallback so Urdu lines render instead of failing.
+        { name: "Noto Naskh Arabic", data: notoArabic, weight: 400, style: "normal" },
       ],
     },
   );

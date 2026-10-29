@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
-import Form from "next/form";
 import Link from "next/link";
 import { Suspense } from "react";
 import { LineGrid } from "@/components/line-grid";
+import { SearchBox } from "@/components/search-box";
 import { CardsSkeleton } from "@/components/skeletons";
 import { getCategory, getLines, getPopularCategories, searchLines } from "@/lib/queries";
 import { browsePath, normalize, parseId } from "@/lib/text";
@@ -39,21 +39,9 @@ async function BrowseContent({ searchParams }: Pick<PageProps<"/browse">, "searc
 
   return (
     <>
-      <Form action="/browse" role="search" className="w-full max-w-[420px]">
-        {selected && <input type="hidden" name="category" value={selected.id} />}
-        <label htmlFor="q" className="sr-only">
-          Search by a keyword or an author
-        </label>
-        <input
-          id="q"
-          name="q"
-          type="search"
-          defaultValue={q}
-          maxLength={100}
-          placeholder="Search by a Keyword or an Author"
-          className="h-11 w-full rounded-[15px] border border-ink bg-parchment px-5 text-center text-[17px] placeholder:text-slate"
-        />
-      </Form>
+      {/* Keyed by the query so the field remounts, showing the current search
+          (or none), whenever it changes — e.g. after "Clear search". */}
+      <SearchBox key={q} q={q} category={selected?.id ?? null} />
 
       <nav aria-label="Categories" className="mt-12 flex flex-wrap justify-center gap-x-[26px] gap-y-3">
         <Link href={browsePath({ q })} className="chip" aria-current={selected ? undefined : "page"}>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useId, useState } from "react";
+import { type ReactNode, useActionState, useId, useState } from "react";
 import { postLine, type PostLineState } from "@/app/actions";
 import { charLength, LINE_MAX, SOURCE_MAX } from "@/lib/text";
 import { CategoryPicker, type CategoryOption } from "./category-picker";
@@ -9,7 +9,8 @@ import { SubmittedDialog } from "./submitted-dialog";
 
 const initialState: PostLineState = { status: "idle" };
 
-export function Composer({ categories }: { categories: CategoryOption[] }) {
+/** `buddy` is a decorative friend that stands beside the Submit button. */
+export function Composer({ categories, buddy }: { categories: CategoryOption[]; buddy?: ReactNode }) {
   const [state, formAction, pending] = useActionState(postLine, initialState);
   const [dismissedId, setDismissedId] = useState<string | null>(null);
   // A new key after each successful post remounts the fields, clearing them.
@@ -31,9 +32,16 @@ export function Composer({ categories }: { categories: CategoryOption[] }) {
             {state.errors.form}
           </p>
         )}
-        <button type="submit" className="btn btn-red mt-16 min-w-[130px] self-center" disabled={pending}>
-          {pending ? "Sending…" : "Submit"}
-        </button>
+        <div className="relative mt-16 self-center">
+          <button type="submit" className="btn btn-red min-w-[130px]" disabled={pending}>
+            {pending ? "Sending…" : "Submit"}
+          </button>
+          {buddy && (
+            <div className="absolute bottom-0 left-full ml-5" data-busy={pending || undefined}>
+              {buddy}
+            </div>
+          )}
+        </div>
       </form>
       {submitted && (
         <SubmittedDialog line={submitted} onClose={() => setDismissedId(submitted.id)} />

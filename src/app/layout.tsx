@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Itim, Jacques_Francois } from "next/font/google";
 import Image from "next/image";
 import Link from "next/link";
+import { Squirrel } from "@/components/autumn";
 import "./globals.css";
 
 const jacques = Jacques_Francois({ weight: "400", subsets: ["latin"], variable: "--font-jacques" });
@@ -24,25 +25,28 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body className="flex min-h-dvh flex-col">
         <header className="w-full px-6 md:px-[41px]">
           <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-3 border-b-2 border-burgundy pt-8 pb-4">
-            <Link href="/" className="shrink-0">
-              <Image
-                src="/logo.svg"
-                alt="Commonplace"
-                width={170}
-                height={39}
-                priority
-                unoptimized
-                className="h-auto w-[140px] md:w-[170px]"
-              />
-            </Link>
+            <div className="flex shrink-0 items-end gap-1.5">
+              <Link href="/">
+                <Image
+                  src="/logo.svg"
+                  alt="Commonplace"
+                  width={170}
+                  height={39}
+                  priority
+                  unoptimized
+                  className="h-auto w-[140px] md:w-[170px]"
+                />
+              </Link>
+              <Squirrel className="-mb-1 w-[38px] md:w-[46px]" />
+            </div>
             <nav aria-label="Main" className="flex gap-6 text-base text-slate md:gap-[42px] md:text-[17px]">
-              <Link href="/browse" className="hover:text-burgundy">
+              <Link href="/browse" className="nav-leaf hover:text-burgundy">
                 Browse
               </Link>
-              <Link href="/submit" className="hover:text-burgundy">
+              <Link href="/submit" className="nav-leaf hover:text-burgundy">
                 Submit a line
               </Link>
-              <Link href="/about" className="hover:text-burgundy">
+              <Link href="/about" className="nav-leaf hover:text-burgundy">
                 About
               </Link>
             </nav>

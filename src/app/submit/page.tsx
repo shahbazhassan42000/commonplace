@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
+import { Mushroom } from "@/components/autumn";
 import { Composer } from "@/components/composer";
 import { getPopularCategories } from "@/lib/queries";
 
@@ -15,7 +16,7 @@ export default async function SubmitPage() {
         {/* The rich-text editor is client-only (and uses unstable values), so
             it streams in rather than being part of the static prerender. */}
         <Suspense fallback={<ComposerFallback />}>
-          <Composer categories={categories} />
+          <Composer categories={categories} buddy={<Mushroom className="w-[54px]" />} />
         </Suspense>
       </div>
     </div>

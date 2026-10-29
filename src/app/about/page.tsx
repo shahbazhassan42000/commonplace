@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { TeaCup } from "@/components/autumn";
 
 export const metadata: Metadata = { title: "About" };
 
@@ -8,7 +9,11 @@ export default function AboutPage() {
       <h1 className="text-center text-4xl text-balance md:text-[44px]">
         A commonplace book, kept in public
       </h1>
-      <hr className="mt-[45px] w-[132px] border-t-[5px] border-burgundy" />
+      {/* The teacup sits on the rule, so the rule's top margin makes room for it. */}
+      <div className="relative mt-[88px]">
+        <TeaCup className="absolute bottom-[3px] left-1/2 w-[66px] -translate-x-1/2" />
+        <hr className="w-[132px] border-t-[5px] border-burgundy" />
+      </div>
       <div className="mt-6 font-hand text-slate">
         <p className="text-[22px] md:text-2xl">
           Commonplace is a home for the lines that stay with you - quotes, poems, and passages

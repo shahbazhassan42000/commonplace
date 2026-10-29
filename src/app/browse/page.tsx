@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
+import { Hedgehog } from "@/components/autumn";
 import { LineGrid } from "@/components/line-grid";
 import { SearchBox } from "@/components/search-box";
 import { CardsSkeleton } from "@/components/skeletons";
@@ -57,6 +58,7 @@ async function BrowseContent({ searchParams }: Pick<PageProps<"/browse">, "searc
             {category.name}
           </Link>
         ))}
+        <Hedgehog className="w-[54px] self-end" />
       </nav>
 
       {q && (

@@ -5,7 +5,7 @@ import { ImageResponse } from "next/og";
 import { getLine, type LineFull } from "./queries";
 import { cardParagraphs, hasRtl, isRtl, rtlLine } from "./rtl";
 import { getObject, putObject } from "./storage";
-import { CARD_VERSION } from "./text";
+import { CARD_VERSION, cardFingerprint } from "./text";
 
 const [itim, jacquesFrancois, notoArabic, logo] = await Promise.all([
   readFile(join(process.cwd(), "assets/fonts/Itim-Regular.ttf")),
@@ -15,19 +15,22 @@ const [itim, jacquesFrancois, notoArabic, logo] = await Promise.all([
 ]);
 const logoSrc = `data:image/svg+xml;base64,${logo.toString("base64")}`;
 
-export const cardKey = (lineId: string) => `cards/v${CARD_VERSION}/${lineId}.png`;
+export const cardKey = (line: LineFull) =>
+  `cards/v${CARD_VERSION}/${line.id}-${cardFingerprint(line)}.png`;
 
 /**
- * Share cards are rendered once, stored in Neon Object Storage, and served
- * from there afterwards. Returns null when the line doesn't exist.
+ * Share cards are rendered once per version of a line, stored in Neon Object
+ * Storage, and served from there afterwards. The key carries a fingerprint of
+ * the card's content, so an edit renders a new card. Returns null when the
+ * line doesn't exist.
  */
 export async function getCard(lineId: string) {
-  const key = cardKey(lineId);
+  const line = await getLine(lineId);
+  if (!line) return null;
+  const key = cardKey(line);
   const stored = await getObject(key);
   if (stored) return { key, png: stored, source: "storage" as const };
 
-  const line = await getLine(lineId);
-  if (!line) return null;
   const png = await renderCard(line);
   await putObject(key, png, "image/png");
   return { key, png, source: "generated" as const };

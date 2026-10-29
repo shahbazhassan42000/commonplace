@@ -54,8 +54,22 @@ export function browsePath({
 /** Bump to regenerate every share card (and bust CDN caches) after a redesign. */
 export const CARD_VERSION = 4;
 
-export function cardPath(line: { id: string }) {
-  return `/l/${line.id}/card?v=${CARD_VERSION}`;
+type CardLine = { id: string; text: string; source: string | null; category: { name: string } };
+
+/**
+ * A short fingerprint (FNV-1a) of what a line's share card shows. It's part of
+ * the card's URL and storage key, so an edited line gets a fresh card.
+ */
+export function cardFingerprint(line: CardLine) {
+  let hash = 0x811c9dc5;
+  for (const char of `${line.text}\u0000${line.source ?? ""}\u0000${line.category.name}`) {
+    hash = Math.imul(hash ^ (char.codePointAt(0) ?? 0), 0x01000193);
+  }
+  return (hash >>> 0).toString(36);
+}
+
+export function cardPath(line: CardLine) {
+  return `/l/${line.id}/card?v=${CARD_VERSION}.${cardFingerprint(line)}`;
 }
 
 /** Accepts ids and ?before= cursors; anything else is null. */

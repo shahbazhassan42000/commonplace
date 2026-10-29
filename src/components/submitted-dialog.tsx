@@ -15,7 +15,20 @@ export function SubmittedDialog({
   onClose: () => void;
 }) {
   const ref = useRef<HTMLDialogElement>(null);
-  useEffect(() => ref.current?.showModal(), []);
+  const opened = useRef(false);
+
+  // Next.js hides pages with React's Activity rather than unmounting them, and
+  // re-runs this Effect on return: open only once, and close (which dismisses)
+  // when the page is hidden — e.g. via "See your line" — so a hidden modal
+  // can't linger over the next page.
+  useEffect(() => {
+    const dialog = ref.current;
+    if (dialog && !opened.current) {
+      dialog.showModal();
+      opened.current = true;
+    }
+    return () => dialog?.close();
+  }, []);
 
   return (
     <dialog

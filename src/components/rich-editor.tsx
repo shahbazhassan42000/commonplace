@@ -64,8 +64,11 @@ export function RichEditor({
 
   // Report the starting text once the editor parses initialHTML (keeps the
   // character counter right after a failed submit re-populates the field).
+  // Next.js keeps visited pages alive, hidden with React's Activity, and hiding
+  // destroys the editor; returning re-runs this Effect with that destroyed
+  // instance before useEditor supplies a fresh one, so skip it then.
   useEffect(() => {
-    if (editor) onText?.(editor.getText());
+    if (editor && !editor.isDestroyed) onText?.(editor.getText());
   }, [editor, onText]);
 
   return (

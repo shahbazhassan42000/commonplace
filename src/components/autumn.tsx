@@ -1,5 +1,13 @@
 import type { CSSProperties } from "react";
-import { HEDGEHOG, LEAVES, MUSHROOM, SLEEPY_FOX, SQUIRREL, TEACUP } from "./autumn-art";
+import {
+  HEDGEHOG,
+  LEAVES,
+  MUSHROOM,
+  READING_COUPLE,
+  SLEEPY_FOX,
+  SQUIRREL,
+  TEACUP,
+} from "./autumn-art";
 import { Critter } from "./critter";
 
 // The site's autumn friends. Each is a small hand-drawn SVG with one quiet idle
@@ -44,6 +52,14 @@ export function Mushroom({ className }: Props) {
   );
 }
 
+export function ReadingCouple({ className }: Props) {
+  return (
+    <Critter className={className}>
+      <Art svg={READING_COUPLE} />
+    </Critter>
+  );
+}
+
 export function Hedgehog({ className }: Props) {
   return (
     <Critter className={className}>
@@ -52,8 +68,10 @@ export function Hedgehog({ className }: Props) {
   );
 }
 
-// Leaves drifting down the margins either side of a centered column. Negative
-// delays start them mid-fall; `rest` is where each sits when motion is reduced.
+// Leaves drifting down the margins either side of a centered column, through
+// the whole layer the caller sizes and places (set [--pace:n] for a taller one).
+// Negative delays start them mid-fall; `rest` is where each sits when motion
+// is reduced.
 const FALLING: {
   leaf: keyof typeof LEAVES;
   left: string;
@@ -73,7 +91,7 @@ const FALLING: {
 
 export function FallingLeaves({ className = "" }: Props) {
   return (
-    <Critter className={`h-[380px] overflow-hidden ${className}`}>
+    <Critter className={`falling-leaves ${className}`}>
       {FALLING.map((f, i) => (
         <span
           key={i}

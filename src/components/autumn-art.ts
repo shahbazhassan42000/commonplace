@@ -18,6 +18,9 @@ const BROWN_DARK = "#6f4a31";
 const SPINES = "#8d6248";
 const LEAF_RED = "#c0482f";
 const TEA = "#b97a4e";
+const GINGER = "#e5975a";
+const GINGER_DARK = "#c4693a";
+const GINGER_LIGHT = "#f6d3b2";
 
 const svg = (viewBox: string, body: string) =>
   `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${viewBox}" fill="none" stroke-linecap="round" stroke-linejoin="round">${body}</svg>`;
@@ -148,6 +151,69 @@ export const MUSHROOM = svg(
       <ellipse cx="46.5" cy="58" rx="2.6" ry="2.2" fill="${CREAM}" stroke="${INK}" stroke-width="1.5"/>
     </g>
   </g>`,
+);
+
+/**
+ * Two cats on an autumn log reading one book together: their tails curl into a
+ * heart that softly beats, she nuzzles in, hearts rise and leaves drift down.
+ */
+export const READING_COUPLE = svg(
+  "0 0 240 176",
+  `<ellipse cx="120" cy="163" rx="94" ry="7" fill="#e6d4b4"/>
+  <g class="cr-beat">
+    <path d="M80 126 C50 116 46 70 62 46 C78 22 112 24 120 44" stroke="${INK}" stroke-width="9.5"/>
+    <path d="M160 126 C190 116 194 70 178 46 C162 22 128 24 120 44" stroke="${INK}" stroke-width="9.5"/>
+    <path d="M80 126 C50 116 46 70 62 46 C78 22 112 24 120 44" stroke="${CREAM}" stroke-width="6"/>
+    <path d="M160 126 C190 116 194 70 178 46 C162 22 128 24 120 44" stroke="${GINGER}" stroke-width="6"/>
+  </g>
+  <g transform="translate(30 14) scale(.62)"><g class="cr-drift">${leafShape(MAPLE, MAPLE_VEINS, RUST, RUST_DARK)}</g></g>
+  <g transform="translate(196 22) scale(.55)"><g class="cr-drift cr-d2">${leafShape(OVAL, OVAL_VEINS, OCHRE, OCHRE_DARK)}</g></g>
+  <rect x="34" y="132" width="172" height="24" rx="12" fill="${BROWN}" stroke="${INK}" stroke-width="2"/>
+  <path d="M50 141 h22 M86 149 h18 M128 141 h26 M164 149 h14" stroke="${BROWN_DARK}" stroke-opacity=".6" stroke-width="1.4"/>
+  <ellipse cx="200" cy="144" rx="7" ry="11" fill="${BROWN_LIGHT}" stroke="${INK}" stroke-width="1.8"/>
+  <ellipse cx="200" cy="144" rx="3.4" ry="5.8" stroke="${BROWN}" stroke-width="1.2"/>
+  <g transform="translate(58 125) rotate(-18) scale(.42)">${leafShape(MAPLE, MAPLE_VEINS, LEAF_RED, "#8f3220")}</g>
+  <path d="M70 134 C66 110 74 94 92 94 C110 94 118 110 114 134 Z" fill="${CREAM}" stroke="${INK}" stroke-width="2"/>
+  <path d="M126 134 C122 110 130 94 148 94 C166 94 174 110 170 134 Z" fill="${GINGER}" stroke="${INK}" stroke-width="2"/>
+  <ellipse cx="149" cy="120" rx="9" ry="11" fill="${GINGER_LIGHT}"/>
+  <ellipse cx="81" cy="134.5" rx="6.5" ry="3.2" fill="${CREAM}" stroke="${INK}" stroke-width="1.7"/>
+  <ellipse cx="103" cy="134.5" rx="6.5" ry="3.2" fill="${CREAM}" stroke="${INK}" stroke-width="1.7"/>
+  <ellipse cx="137" cy="134.5" rx="6.5" ry="3.2" fill="${GINGER}" stroke="${INK}" stroke-width="1.7"/>
+  <ellipse cx="159" cy="134.5" rx="6.5" ry="3.2" fill="${GINGER}" stroke="${INK}" stroke-width="1.7"/>
+  <path d="M100 104 L120 108 L120 128 L100 124 Z M120 108 L140 104 L140 124 L120 128 Z" fill="${CREAM}" stroke="${INK}" stroke-width="1.8"/>
+  <path d="M104 110.5 l12 2.4 M104 115.5 l12 2.4 M104 120.5 l8 1.6 M124 112.9 l12 -2.4 M124 117.9 l12 -2.4 M124 122.9 l8 -1.6" stroke="${INK}" stroke-opacity=".35" stroke-width="1.1"/>
+  <path d="M120 128 l1.5 7" stroke="${ROSE_DARK}" stroke-width="1.8"/>
+  <ellipse cx="100.5" cy="116" rx="4.6" ry="3.7" fill="${CREAM}" stroke="${INK}" stroke-width="1.6"/>
+  <ellipse cx="139.5" cy="116" rx="4.6" ry="3.7" fill="${GINGER}" stroke="${INK}" stroke-width="1.6"/>
+  <g transform="rotate(8 92 80)"><g class="cr-nuzzle">
+    <path d="M74 70 L76 48 L92 62 Z M98 60 L110 46 L112 70 Z" fill="${CREAM}" stroke="${INK}" stroke-width="2"/>
+    <path d="M76.8 66 L78 53 L87.5 61.5 Z M101.5 60.5 L108.6 52 L109.6 65.5 Z" fill="${BLUSH}"/>
+    <circle cx="92" cy="80" r="21" fill="${CREAM}" stroke="${INK}" stroke-width="2"/>
+    <path d="M100 61 L94 57.5 L94.6 64.5 Z M100 61 L106 57.6 L105.4 64.6 Z" fill="${ROSE}" stroke="${INK}" stroke-width="1.3"/>
+    <circle cx="100" cy="61" r="1.8" fill="${ROSE_DARK}"/>
+    <path d="M81 80 q4 -4.5 8 0 M95 80 q4 -4.5 8 0" stroke="${INK}" stroke-width="1.9"/>
+    <ellipse cx="80" cy="87" rx="3.4" ry="2" fill="${BLUSH}"/>
+    <ellipse cx="104" cy="87" rx="3.4" ry="2" fill="${BLUSH}"/>
+    <path d="M90.4 85.6 L93.6 85.6 L92 87.4 Z" fill="${ROSE_DARK}"/>
+    <path d="M88.5 89.2 q1.75 1.8 3.5 0 q1.75 1.8 3.5 0" stroke="${INK}" stroke-width="1.3"/>
+  </g></g>
+  <g transform="rotate(-7 150 78)">
+    <path d="M132 68 L134 46 L150 60 Z M156 58 L168 44 L170 68 Z" fill="${GINGER}" stroke="${INK}" stroke-width="2"/>
+    <path d="M134.8 64 L136 51 L145.5 59.5 Z M159.5 58.5 L166.6 50 L167.6 63.5 Z" fill="${BLUSH}"/>
+    <circle cx="150" cy="78" r="21" fill="${GINGER}" stroke="${INK}" stroke-width="2"/>
+    <path d="M145 60 l1 6 M150 59 l0 7 M155 60 l-1 6" stroke="${GINGER_DARK}" stroke-width="1.7"/>
+    <ellipse cx="150" cy="88.5" rx="9" ry="6.5" fill="${CREAM}"/>
+    <g class="cr-blink">${eye(141, 79, 1.9)}${eye(159, 79, 1.9)}</g>
+    <ellipse cx="137" cy="86" rx="3.4" ry="2" fill="${BLUSH}"/>
+    <ellipse cx="163" cy="86" rx="3.4" ry="2" fill="${BLUSH}"/>
+    <path d="M148.4 84.6 L151.6 84.6 L150 86.4 Z" fill="${ROSE_DARK}"/>
+    <path d="M146.5 88.2 q1.75 1.8 3.5 0 q1.75 1.8 3.5 0" stroke="${INK}" stroke-width="1.3"/>
+  </g>
+  <path d="M130 96 C140 101 158 101 167 96 L167 103 C158 108 140 108 130 103 Z" fill="${ROSE}" stroke="${INK}" stroke-width="1.6"/>
+  <path d="M155 103 C158 108 161 113 160 119 L153.6 117 C154.6 112.4 153.6 107.6 151 104 Z" fill="${ROSE}" stroke="${INK}" stroke-width="1.6"/>
+  <g transform="translate(107 31) scale(.34)"><path class="cr-heart" d="${HEART}" fill="${ROSE}"/></g>
+  <g transform="translate(117.5 22) scale(.28)"><path class="cr-heart cr-d2" d="${HEART}" fill="${ROSE_DARK}"/></g>
+  <g transform="translate(125 32) scale(.3)"><path class="cr-heart cr-d3" d="${HEART}" fill="${BLUSH}"/></g>`,
 );
 
 /** A hedgehog with a leaf and a flower on its spines; its nose sniffs. */

@@ -243,7 +243,8 @@ body {
   height: auto;
   overflow: visible;
 }
-.critter :is(.cr-tail, .cr-blink, .cr-breathe, .cr-sway, .cr-write, .cr-sniff, .cr-steam, .cr-z) {
+.critter
+  :is(.cr-tail, .cr-blink, .cr-breathe, .cr-sway, .cr-write, .cr-sniff, .cr-steam, .cr-z, .cr-heart, .cr-nuzzle, .cr-beat, .cr-drift) {
   transform-box: fill-box;
 }
 .cr-tail {
@@ -279,6 +280,23 @@ body {
 }
 .cr-z {
   animation: cr-z 4.2s ease-out infinite;
+}
+/* The reading couple: their tail-heart beats, she nuzzles in, hearts rise. */
+.cr-beat {
+  transform-origin: 50% 60%;
+  animation: cr-beat 2.6s ease-in-out infinite;
+}
+.cr-nuzzle {
+  transform-origin: 50% 95%;
+  animation: cr-nuzzle 3.8s ease-in-out infinite;
+}
+.cr-heart {
+  transform-origin: center;
+  animation: cr-heart 3.9s ease-out infinite;
+}
+.cr-drift {
+  transform-origin: center;
+  animation: cr-drift 7s linear infinite;
 }
 .cr-d2 {
   animation-delay: 1.2s;
@@ -323,12 +341,41 @@ body {
   25% { opacity: 1; }
   100% { transform: translate(-3px, -7px) scale(1.05); opacity: 0; }
 }
+@keyframes cr-beat {
+  0%, 30%, 100% { transform: scale(1); }
+  10% { transform: scale(1.035); }
+  20% { transform: scale(1.015); }
+}
+@keyframes cr-nuzzle {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(4deg); }
+}
+/* Hearts and drifting leaves sit in scaled groups, so these are local units. */
+@keyframes cr-heart {
+  0% { transform: translateY(10px) scale(0.6); opacity: 0; }
+  25% { opacity: 1; }
+  100% { transform: translateY(-64px) scale(1); opacity: 0; }
+}
+@keyframes cr-drift {
+  0% { transform: translate(0, -10px) rotate(0deg); opacity: 0; }
+  12%, 75% { opacity: 1; }
+  100% { transform: translate(-14px, 150px) rotate(140deg); opacity: 0; }
+}
 
-/* Leaves: the outer span falls, the inner one flutters side to side. */
+/*
+ * Leaves: the outer span falls the full height of its layer (a size
+ * container), the inner one flutters side to side. --pace stretches the
+ * timing for a taller layer, so the leaves drift at the same speed.
+ */
+.falling-leaves {
+  container-type: size;
+  overflow: hidden;
+}
 .leaf-fall {
   position: absolute;
   top: -32px;
-  animation: leaf-fall var(--fall) linear var(--delay) infinite;
+  animation: leaf-fall calc(var(--fall) * var(--pace, 1)) linear calc(var(--delay) * var(--pace, 1))
+    infinite;
 }
 .leaf-flutter {
   display: block;
@@ -337,7 +384,7 @@ body {
 @keyframes leaf-fall {
   0% { transform: translateY(0); opacity: 0; }
   10%, 80% { opacity: 1; }
-  100% { transform: translateY(420px); opacity: 0; }
+  100% { transform: translateY(calc(100cqh + 32px)); opacity: 0; }
 }
 @keyframes leaf-flutter {
   from { transform: translateX(-14px) rotate(-28deg); }

@@ -18,7 +18,7 @@ export default async function Home() {
   return (
     <>
       <div className="relative isolate flex w-full flex-col items-center px-6 pt-[21px] pb-24 md:px-[50px]">
-        <FallingLeaves className="absolute inset-x-0 top-0 -z-10" />
+        <FallingLeaves className="absolute inset-x-0 top-0 -z-10 h-[380px]" />
         <h1 className="sr-only">Commonplace</h1>
         <section aria-labelledby="line-of-the-day" className="flex flex-col items-center text-center">
           <h2 id="line-of-the-day" className="text-sm tracking-[0.08em] text-slate uppercase">

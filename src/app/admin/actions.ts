@@ -209,13 +209,14 @@ export async function editLine(_prev: EditState, formData: FormData): Promise<Ed
   return { status: "success", id };
 }
 
-export async function deleteLine(formData: FormData): Promise<void> {
+/** Deletes every line whose id is posted as an `id` field (one or many). */
+export async function deleteLines(formData: FormData): Promise<void> {
   const session = await readSession();
   if (session?.stage !== "active") redirect("/admin");
 
-  const id = parseId(formData.get("id"));
-  if (!id) return;
-  await query(`DELETE FROM lines WHERE id = $1`, [id]);
+  const ids = formData.getAll("id").map(parseId).filter((id) => id !== null);
+  if (ids.length === 0) return;
+  await query(`DELETE FROM lines WHERE id = ANY($1::bigint[])`, [ids]);
 
   updateTag(LINES_TAG);
   revalidatePath("/admin");

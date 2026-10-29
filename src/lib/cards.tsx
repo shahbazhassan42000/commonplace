@@ -2,6 +2,7 @@ import "server-only";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { ImageResponse } from "next/og";
+import { fitQuote, LINE_HEIGHT } from "./card-fit";
 import { getLine, type LineFull } from "./queries";
 import { cardParagraphs, hasRtl, isRtl, rtlLine } from "./rtl";
 import { getObject, putObject } from "./storage";
@@ -36,42 +37,21 @@ export async function getCard(lineId: string) {
   return { key, png, source: "generated" as const };
 }
 
-/** Trims a body to what fits the card, keeping line breaks and adding an ellipsis. */
-function cardBody(body: string) {
-  const MAX_LINES = 8;
-  const MAX_CHARS = 260;
-  let truncated = false;
-
-  let lines = body.split("\n");
-  if (lines.length > MAX_LINES) {
-    lines = lines.slice(0, MAX_LINES);
-    truncated = true;
-  }
-  let text = lines.join("\n");
-
-  const chars = [...text];
-  if (chars.length > MAX_CHARS) {
-    text = chars.slice(0, MAX_CHARS).join("").trimEnd();
-    truncated = true;
-  }
-  return truncated ? `${text}…` : text;
-}
-
 const FLUSH_RIGHT = { justifyContent: "flex-end", textAlign: "right" } as const;
 // Gap between words laid out as flex items: Noto Sans Arabic's space width.
 const WORD_GAP_EM = 0.26;
 
 async function renderCard(line: LineFull) {
-  const body = cardBody(line.text);
-  const length = [...body].length;
-  const fontSize =
-    length > 200 ? 30 : length > 140 ? 38 : length > 80 ? 46 : length > 40 ? 54 : 60;
+  // The whole line when it fits the card (shrinking the font if needed);
+  // trimmed with an ellipsis only when it can't fit even at the smallest size.
+  const source = `-${line.source ?? "Anonymous"}`;
+  const { fontSize, text: body } = fitQuote(line.text, source);
   // Satori can't lay out right-to-left text itself (see ./rtl). Text with any
   // Urdu is set paragraph by paragraph, each word a flex item placed in its
   // paragraph's direction, so the layout wraps lines in the right order. The
   // source and category go through rtlLine, which leaves Latin text unchanged.
   const rtl = isRtl(body);
-  const quoteStyle = { display: "flex", fontSize, lineHeight: 1.3, color: "#7a3b3b" } as const;
+  const quoteStyle = { display: "flex", fontSize, lineHeight: LINE_HEIGHT, color: "#7a3b3b" } as const;
 
   const image = new ImageResponse(
     (
@@ -128,11 +108,12 @@ async function renderCard(line: LineFull) {
               display: "flex",
               fontFamily: "Jacques Francois",
               fontSize: 30,
+              lineHeight: LINE_HEIGHT,
               color: "#4c5d6e",
               ...(rtl ? FLUSH_RIGHT : {}),
             }}
           >
-            {rtlLine(`-${line.source ?? "Anonymous"}`)}
+            {rtlLine(source)}
           </div>
         </div>
         <div
@@ -154,6 +135,7 @@ async function renderCard(line: LineFull) {
               borderRadius: 20,
               fontFamily: "Jacques Francois",
               fontSize: 26,
+              lineHeight: LINE_HEIGHT,
               color: "#4c5d6e",
             }}
           >

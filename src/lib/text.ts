@@ -52,7 +52,7 @@ export function browsePath({
 }
 
 /** Bump to regenerate every share card (and bust CDN caches) after a redesign. */
-export const CARD_VERSION = 4;
+export const CARD_VERSION = 5;
 
 type CardLine = { id: string; text: string; source: string | null; category: { name: string } };
 
